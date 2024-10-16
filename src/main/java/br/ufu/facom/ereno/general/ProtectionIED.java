@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 /**
  * @author silvio
  */
-public class ProtectionIED extends IED {
+public abstract class ProtectionIED extends IED {
     public ProtectionIED(String label) {
         this.label = label;
         messages = new ArrayList<>();
@@ -271,6 +271,5 @@ public class ProtectionIED extends IED {
     public int getNumberOfMessages() {
         return messages.size();
     }
-
 
 }

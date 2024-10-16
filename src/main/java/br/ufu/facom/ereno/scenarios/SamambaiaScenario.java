@@ -11,6 +11,7 @@ import br.ufu.facom.ereno.attacks.uc05.devices.InjectorIED;
 import br.ufu.facom.ereno.attacks.uc06.devices.HighStNumInjectorIED;
 import br.ufu.facom.ereno.attacks.uc07.devices.HighRateStNumInjectorIED;
 import br.ufu.facom.ereno.attacks.uc08.devices.GrayHoleVictimIED;
+import br.ufu.facom.ereno.attacks.uc09.devices.OrientedGrayHoleIED;
 import br.ufu.facom.ereno.benign.uc00.Input;
 import br.ufu.facom.ereno.benign.uc00.devices.LegitimateProtectionIED;
 import br.ufu.facom.ereno.benign.uc00.devices.MergingUnit;
@@ -34,7 +35,7 @@ public class SamambaiaScenario implements IScenario {
     public static void main(String[] args) throws Exception {
         SamambaiaScenario scenario = new SamambaiaScenario();
         scenario.run();
-        DatasetEval.main(new String[]{});
+//        DatasetEval.main(new String[]{});
     }
 
     SubstationNetwork substationNetwork;
@@ -53,21 +54,22 @@ public class SamambaiaScenario implements IScenario {
         GooseFlow.ECF.loadConfigs();
         SetupIED.ECF.loadConfigs();
         Attacks.ECF.legitimate = true;
-        Attacks.ECF.randomReplay = true;
-        Attacks.ECF.masqueradeOutage = true;
-        Attacks.ECF.masqueradeDamage = true;
-        Attacks.ECF.randomInjection = true;
-        Attacks.ECF.inverseReplay = true;
-        Attacks.ECF.highStNum = true;
-        Attacks.ECF.flooding = true;
+        Attacks.ECF.randomReplay = false;
+        Attacks.ECF.masqueradeOutage = false;
+        Attacks.ECF.masqueradeDamage = false;
+        Attacks.ECF.randomInjection = false;
+        Attacks.ECF.inverseReplay = false;
+        Attacks.ECF.highStNum = false;
+        Attacks.ECF.flooding = false;
         Attacks.ECF.grayhole = false;
+        Attacks.ECF.orientedGrayhole = true;
     }
 
     @Override
     public void setupDevices() {
         // Initializing MU
-//        MergingUnit mu = new MergingUnit(Input.singleElectricalSourceFile);
-        MergingUnit mu = new MergingUnit(Input.electricalSourceFiles);
+        MergingUnit mu = new MergingUnit(Input.singleElectricalSourceFile);
+//        MergingUnit mu = new MergingUnit(Input.electricalSourceFiles);
 //        mu.enableRandomOffsets(numberOfMessages);
         substationNetwork.processLevelDevices.add(mu);
 
@@ -84,7 +86,10 @@ public class SamambaiaScenario implements IScenario {
         HighStNumInjectorIED uc06 = new HighStNumInjectorIED(uc00);
         HighRateStNumInjectorIED uc07 = new HighRateStNumInjectorIED(uc00);
         ProtectionIED uc00forGrayhole = new LegitimateProtectionIED();
+        ProtectionIED uc00forOrientedGrayhole = new LegitimateProtectionIED();
         GrayHoleVictimIED uc08 = new GrayHoleVictimIED(uc00forGrayhole);
+        OrientedGrayHoleIED uc09 = new OrientedGrayHoleIED(uc00forOrientedGrayhole);
+
 
 //        uc00.setInitialTimestamp(mu.getInitialTimestamp());
         uc00.setSubstationNetwork(substationNetwork);
@@ -107,17 +112,23 @@ public class SamambaiaScenario implements IScenario {
 //        uc08.setInitialTimestamp(mu.getInitialTimestamp());
         uc08.setSubstationNetwork(substationNetwork);
 
+        uc09.setInitialTimestamp(mu.getInitialTimestamp());
+        uc09.setSubstationNetwork(substationNetwork);
+
         substationNetwork.processLevelDevices.add(mu);
         substationNetwork.bayLevelDevices.add(uc00);
-        substationNetwork.bayLevelDevices.add(uc01);
-        substationNetwork.bayLevelDevices.add(uc02);
-        substationNetwork.bayLevelDevices.add(uc03);
-        substationNetwork.bayLevelDevices.add(uc04);
-        substationNetwork.bayLevelDevices.add(uc05);
-        substationNetwork.bayLevelDevices.add(uc06);
-        substationNetwork.bayLevelDevices.add(uc07);
-        substationNetwork.bayLevelDevices.add(uc00forGrayhole);
-        substationNetwork.bayLevelDevices.add(uc08);
+//        substationNetwork.bayLevelDevices.add(uc01);
+//        substationNetwork.bayLevelDevices.add(uc02);
+//        substationNetwork.bayLevelDevices.add(uc03);
+//        substationNetwork.bayLevelDevices.add(uc04);
+//        substationNetwork.bayLevelDevices.add(uc05);
+//        substationNetwork.bayLevelDevices.add(uc06);
+//        substationNetwork.bayLevelDevices.add(uc07);
+//        substationNetwork.bayLevelDevices.add(uc00forGrayhole);
+        substationNetwork.bayLevelDevices.add(uc00forOrientedGrayhole);
+//        substationNetwork.bayLevelDevices.add(uc08);
+        substationNetwork.bayLevelDevices.add(uc09);
+
 
         Logger.getLogger("SamambaiaScenario").info("Devices set up!");
     }
@@ -155,16 +166,16 @@ public class SamambaiaScenario implements IScenario {
 
     @Override
     public void exportDataset() {
-        boolean generate_arff = true; // CSV will be used in case this is set to false
+        boolean generate_arff = false; // CSV will be used in case this is set to false
         boolean debug = false;
         try {
             if (!debug) {
                 if (generate_arff) {
-                    ARFFWritter.startWriting("E:\\ereno dataset\\ereninho\\multiclass_train.arff");
+                    ARFFWritter.startWriting("C:\\Users\\zomca\\IdeaProjects\\ereno-uc09\\datasets\\test.arff");
                     ARFFWritter.processDataset(substationNetwork.stationBusMessages, substationNetwork.processBusMessages);
                     ARFFWritter.finishWriting();
                 } else {
-                    CSVWritter.startWriting("E:\\ereno dataset\\ereninho\\dataset.csv");
+                    CSVWritter.startWriting("C:\\Users\\zomca\\IdeaProjects\\ereno-uc09\\datasets\\test.arff");
                     CSVWritter.processDataset(substationNetwork.stationBusMessages, substationNetwork.processBusMessages);
                     CSVWritter.finishWriting();
                 }

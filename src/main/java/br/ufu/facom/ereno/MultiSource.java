@@ -5,6 +5,7 @@ import br.ufu.facom.ereno.api.GooseFlow;
 import br.ufu.facom.ereno.api.SetupIED;
 import br.ufu.facom.ereno.attacks.uc03.devices.MasqueradeFakeFaultIED;
 import br.ufu.facom.ereno.attacks.uc04.devices.MasqueradeFakeNormalED;
+import br.ufu.facom.ereno.attacks.uc09.devices.OrientedGrayHoleIED;
 import br.ufu.facom.ereno.benign.uc00.Input;
 import br.ufu.facom.ereno.attacks.uc01.devices.RandomReplayerIED;
 import br.ufu.facom.ereno.attacks.uc02.devices.InverseReplayerIED;
@@ -20,14 +21,13 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 import static br.ufu.facom.ereno.api.GooseFlow.ECF.numberOfMessages;
-import static br.ufu.facom.ereno.general.IED.randomBetween;
 import static br.ufu.facom.ereno.dataExtractors.GSVDatasetWriter.*;
 
 public class MultiSource {
 
     public static void main(String[] args) throws Exception {
         init();
-        numberOfMessages = 10;
+        numberOfMessages = 100;
         twoDevices("debug", numberOfMessages, false);
 //        twoDevices("train", numberOfMessages, true);
 //        twoDevices("test", numberOfMessages, false);
@@ -40,7 +40,7 @@ public class MultiSource {
 
 
     public static void noIDSDataset(String datasetName, int numberOfMessages) throws IOException {
-        startWriting("E:\\ereno dataset\\hibrid_dataset_GOOSE_" + datasetName + ".arff");
+        startWriting("C:\\Users\\zomca\\IdeaProjects\\ereno-uc09\\datasets\\" + datasetName + ".arff");
 
         // Generate SV
         MergingUnit mu = runMU();
@@ -75,9 +75,15 @@ public class MultiSource {
 
         ProtectionIED uc00forGrayhole = new LegitimateProtectionIED();
         uc00forGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
-        uc00forGrayhole.run((int) (numberOfMessages * 1.2)); // generate 20% more, because 20% will be discarded
+        uc00forGrayhole.run((int) (numberOfMessages * 1.2));
         GrayHoleVictimIED uc08 = new GrayHoleVictimIED(uc00forGrayhole);
-        uc08.run(80); //80 = discards 20%
+        uc08.run(80);
+
+        ProtectionIED uc00forOrientedGrayhole = new LegitimateProtectionIED();
+        uc00forOrientedGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
+        uc00forOrientedGrayhole.run((int) (numberOfMessages * 1.2));
+        OrientedGrayHoleIED uc09 = new OrientedGrayHoleIED(uc00forOrientedGrayhole);
+        uc09.run(50, 10);
 
         uc00.addMessages(uc01.getMessages());
         uc00.addMessages(uc02.getMessages());
@@ -96,7 +102,7 @@ public class MultiSource {
 
     public static void twoDevices(String datasetName, int n, boolean train) throws IOException {
         numberOfMessages = n;
-        startWriting("E:\\ereno dataset\\hibrid_dataset_GOOSE_" + datasetName + ".arff");
+        startWriting("C:\\Users\\zomca\\IdeaProjects\\ereno-uc09\\datasets\\" + datasetName + ".arff");
 
         // Generating SV messages
         MergingUnit mu = runMU();
@@ -120,11 +126,12 @@ public class MultiSource {
 //            runUC01(legitimateIED, mu);
 //            runUC02(legitimateIED, mu);
 //            runUC03(legitimateIED, mu);
-            runUC04(legitimateIED, mu);
+//            runUC04(legitimateIED, mu);
 //            runUC05(legitimateIED, mu);
 //            runUC06(legitimateIED, mu);
 //            runUC07(legitimateIED, mu);  // parei aqui, os outros parece que tem bug no timestamp
 //            runUC08(legitimateIED, mu);
+            runUC09(legitimateIED, mu);
         }
 
         finishWriting();
@@ -132,8 +139,8 @@ public class MultiSource {
     }
 
     public static MergingUnit runMU() {
-        MergingUnit mu = new MergingUnit(Input.electricalSourceFiles);
-//        MergingUnit mu = new MergingUnit(Input.singleElectricalSourceFile);
+//        MergingUnit mu = new MergingUnit(Input.electricalSourceFiles);
+        MergingUnit mu = new MergingUnit(Input.singleElectricalSourceFile);
         mu.enableRandomOffsets(numberOfMessages);
         mu.run(numberOfMessages * 4763);
         return mu;
@@ -216,6 +223,16 @@ public class MultiSource {
         Logger.getLogger("MultiSource").info("Writting " + qtdGrayhole08 + " gryhole (UC08) messages to dataset.");
     }
 
+    public static void runUC09(LegitimateProtectionIED uc00, MergingUnit mu) throws IOException {
+        ProtectionIED uc00forOrientedGrayhole = new LegitimateProtectionIED();
+        uc00forOrientedGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
+        uc00forOrientedGrayhole.run((int) (numberOfMessages * 1.2));
+        OrientedGrayHoleIED uc09 = new OrientedGrayHoleIED(uc00forOrientedGrayhole);
+        uc09.run(50, 10);
+        int qtdOrientedGrayhole09 = writeAttack(uc00, uc09, mu, false);
+        Logger.getLogger("MultiSource").info("Writting " + qtdOrientedGrayhole09 + " oriented grayhole   (UC08) messages to dataset.");
+    }
+
 
     public static void init() {
         Attacks.ECF.loadConfigs();
@@ -230,6 +247,7 @@ public class MultiSource {
         Attacks.ECF.highStNum = true;
         Attacks.ECF.flooding = true;
         Attacks.ECF.grayhole = false;
+        Attacks.ECF.orientedGrayhole = true;
     }
 
 

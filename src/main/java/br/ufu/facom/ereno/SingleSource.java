@@ -9,6 +9,7 @@ import br.ufu.facom.ereno.attacks.uc05.devices.InjectorIED;
 import br.ufu.facom.ereno.attacks.uc06.devices.HighStNumInjectorIED;
 import br.ufu.facom.ereno.attacks.uc07.devices.HighRateStNumInjectorIED;
 import br.ufu.facom.ereno.attacks.uc08.devices.GrayHoleVictimIED;
+import br.ufu.facom.ereno.attacks.uc09.devices.OrientedGrayHoleIED;
 import br.ufu.facom.ereno.benign.uc00.devices.LegitimateProtectionIED;
 import br.ufu.facom.ereno.benign.uc00.devices.MergingUnit;
 import br.ufu.facom.ereno.attacks.uc01.devices.RandomReplayerIED;
@@ -38,6 +39,8 @@ public class SingleSource {
         Attacks.ECF.highStNum = true;
         Attacks.ECF.flooding = true;
         Attacks.ECF.grayhole = false;
+        Attacks.ECF.orientedGrayhole = true;
+
 
         SingleSource.lightweightDataset("E:\\ereno dataset\\new\\" + SetupIED.ECF.iedName + ".arff", true);
     }
@@ -131,6 +134,16 @@ public class SingleSource {
             totalMessageCount = totalMessageCount + uc08.getNumberOfMessages();
         }
 
+        OrientedGrayHoleIED uc09;
+        if (Attacks.ECF.orientedGrayhole) {
+            uc09 = new OrientedGrayHoleIED(uc00);
+            uc09.run(GooseFlow.ECF.numberOfMessages);
+            uc09.run(20);
+            writeGooseMessagesToFile(uc09.getMessages(), false);
+            totalMessageCount = totalMessageCount + uc09.getNumberOfMessages();
+        }
+
+
         finishWriting();
         long endTime = System.currentTimeMillis();
         Logger.getLogger("Time").info("Tempo gasto para gerar "
@@ -221,6 +234,14 @@ public class SingleSource {
             uc08.run(20);
             writeGooseMessagesToFile(uc08.getMessages(), false);
             totalMessageCount = totalMessageCount + uc08.getNumberOfMessages();
+        }
+
+        OrientedGrayHoleIED uc09;
+        if (Attacks.ECF.orientedGrayhole) {
+            uc09 = new OrientedGrayHoleIED(uc00);
+            uc09.run(GooseFlow.ECF.numberOfMessages);
+            writeGooseMessagesToFile(uc09.getMessages(), false);
+            totalMessageCount = totalMessageCount + uc09.getNumberOfMessages();
         }
 
         finishWriting();

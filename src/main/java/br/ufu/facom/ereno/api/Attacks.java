@@ -31,6 +31,7 @@ public class Attacks extends HttpServlet {
         public static boolean flooding;
         public static boolean grayhole;
         public static boolean stealthyInjection;
+        public static boolean orientedGrayhole;
 
         public static void loadConfigs() { // Used outside the servlet contexts
             GsonBuilder gsonBuilder = new GsonBuilder();
@@ -51,6 +52,9 @@ public class Attacks extends HttpServlet {
                 logger.info("Attacks.ECF.masqueradeDamage: " + ecf.masqueradeDamage);
                 logger.info("Attacks.ECF.highStNum: " + ecf.highStNum);
                 logger.info("Attacks.ECF.flooding: " + ecf.flooding);
+                logger.info("Attacks.ECF.grayhole: " + ecf.grayhole);
+                logger.info("Attacks.ECF.stealthyInjection: " + ecf.stealthyInjection);
+                logger.info("Attacks.ECF.orientedGrayhole: " + ecf.orientedGrayhole);
             } catch (IOException e) {
                 e.printStackTrace();
                 throw new RuntimeException(e);
@@ -174,6 +178,12 @@ public class Attacks extends HttpServlet {
             ECF.grayhole = request.getParameter("grayhole").equals("on");
         }
 
+        if (request.getParameter("orientedGrayhole") == null) {
+            ECF.orientedGrayhole = false;
+        } else {
+            ECF.orientedGrayhole = request.getParameter("orientedGrayhole").equals("on");
+        }
+
         if (request.getParameter("stealthy-injection") == null) {
             ECF.stealthyInjection = false;
         } else {
@@ -181,7 +191,7 @@ public class Attacks extends HttpServlet {
         }
 
         if (ECF.legitimate || ECF.randomInjection || ECF.randomReplay || ECF.inverseReplay || ECF.masqueradeDamage ||
-                ECF.masqueradeOutage || ECF.flooding || ECF.highStNum || ECF.grayhole || ECF.stealthyInjection) { // it was handled parameters from header
+                ECF.masqueradeOutage || ECF.flooding || ECF.highStNum || ECF.grayhole || ECF.stealthyInjection || ECF.orientedGrayhole) { // it was handled parameters from header
             out.println("<body><html>");
             out.println("<h2> Clique para baixar o ECL do fluxo <a href=\"attacks\" download> Attacks </a></h2>");
             out.println("<h1>" + "Done!" + "</h1>");

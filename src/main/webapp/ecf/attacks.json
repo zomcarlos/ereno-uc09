@@ -9,5 +9,6 @@
   "highStNum": true,
   "flooding": true,
   "grayhole": false,
-  "stealthyAttack": false
+  "stealthyAttack": false,
+  "orientedGrayhole": true
 }
