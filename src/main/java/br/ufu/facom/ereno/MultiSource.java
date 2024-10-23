@@ -83,7 +83,7 @@ public class MultiSource {
         uc00forOrientedGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
         uc00forOrientedGrayhole.run((int) (numberOfMessages * 1.2));
         OrientedGrayHoleIED uc09 = new OrientedGrayHoleIED(uc00forOrientedGrayhole);
-        uc09.run(50, 10);
+        uc09.run(50);
 
         uc00.addMessages(uc01.getMessages());
         uc00.addMessages(uc02.getMessages());
@@ -228,9 +228,9 @@ public class MultiSource {
         uc00forOrientedGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
         uc00forOrientedGrayhole.run((int) (numberOfMessages * 1.2));
         OrientedGrayHoleIED uc09 = new OrientedGrayHoleIED(uc00forOrientedGrayhole);
-        uc09.run(50, 10);
+        uc09.run(50);
         int qtdOrientedGrayhole09 = writeAttack(uc00, uc09, mu, false);
-        Logger.getLogger("MultiSource").info("Writting " + qtdOrientedGrayhole09 + " oriented grayhole   (UC08) messages to dataset.");
+        Logger.getLogger("MultiSource").info("Writting " + qtdOrientedGrayhole09 + " oriented grayhole (UC09) messages to dataset.");
     }
 
 

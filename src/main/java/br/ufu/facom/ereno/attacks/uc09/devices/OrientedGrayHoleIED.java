@@ -15,12 +15,12 @@ public class OrientedGrayHoleIED extends ProtectionIED {
         this.legitimateIED = legitimate;
     }
 
-    public void run(int discardRate, int toDiscard) {
+    public void run(int discardRate) {
         setInitialTimestamp((float) legitimateIED.getMessages().get(0).getTimestamp());
 
         Logger.getLogger("OrientedGrayHoleIED").info(
                 "Feeding OrientedGrayHole IED with " + legitimateIED.copyMessages().size() + " legitimate messages");
-        messageCreator = new OrientedGrayHoleCreator(legitimateIED.copyMessages(), discardRate, toDiscard); // feeds the message creator with legitimate messages
+        messageCreator = new OrientedGrayHoleCreator(legitimateIED.copyMessages()); // feeds the message creator with legitimate messages
         messageCreator.generate(this, discardRate); // pass itself to receive messages from generator
     }
 

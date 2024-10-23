@@ -19,7 +19,6 @@ import br.ufu.facom.ereno.SubstationNetwork;
 import br.ufu.facom.ereno.dataExtractors.ARFFWritter;
 import br.ufu.facom.ereno.dataExtractors.CSVWritter;
 import br.ufu.facom.ereno.dataExtractors.DebugWritter;
-import br.ufu.facom.ereno.evaluation.DatasetEval;
 import br.ufu.facom.ereno.general.IED;
 import br.ufu.facom.ereno.general.ProtectionIED;
 import br.ufu.facom.ereno.messages.Goose;
@@ -107,13 +106,17 @@ public class SamambaiaScenario implements IScenario {
         uc06.setSubstationNetwork(substationNetwork);
 //        uc07.setInitialTimestamp(mu.getInitialTimestamp());
         uc07.setSubstationNetwork(substationNetwork);
-//        uc00forGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
+
+        uc00forGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
         uc00forGrayhole.setSubstationNetwork(substationNetwork);
 //        uc08.setInitialTimestamp(mu.getInitialTimestamp());
-        uc08.setSubstationNetwork(substationNetwork);
+//        uc08.setSubstationNetwork(substationNetwork);
 
-        uc09.setInitialTimestamp(mu.getInitialTimestamp());
-        uc09.setSubstationNetwork(substationNetwork);
+
+        uc00forOrientedGrayhole.setInitialTimestamp(mu.getInitialTimestamp());
+        uc00forOrientedGrayhole.setSubstationNetwork(substationNetwork);
+        uc08.setInitialTimestamp(mu.getInitialTimestamp());
+        uc08.setSubstationNetwork(substationNetwork);
 
         substationNetwork.processLevelDevices.add(mu);
         substationNetwork.bayLevelDevices.add(uc00);
@@ -125,8 +128,8 @@ public class SamambaiaScenario implements IScenario {
 //        substationNetwork.bayLevelDevices.add(uc06);
 //        substationNetwork.bayLevelDevices.add(uc07);
 //        substationNetwork.bayLevelDevices.add(uc00forGrayhole);
-        substationNetwork.bayLevelDevices.add(uc00forOrientedGrayhole);
 //        substationNetwork.bayLevelDevices.add(uc08);
+        substationNetwork.bayLevelDevices.add(uc00forOrientedGrayhole);
         substationNetwork.bayLevelDevices.add(uc09);
 
 
@@ -146,6 +149,9 @@ public class SamambaiaScenario implements IScenario {
         // Generating GOOSE messages
         for (IED ied : substationNetwork.bayLevelDevices) {
             Logger.getLogger("SambaiaScenario").info(substationNetwork.bayLevelDevices.size() + " devices connected to the substation network.");
+            if (ied instanceof OrientedGrayHoleIED){
+                ied.run(numberOfMessages);
+            }
             ied.run(numberOfMessages);
             int numAddedMessages = 0;
 

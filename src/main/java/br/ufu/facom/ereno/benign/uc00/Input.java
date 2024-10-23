@@ -2,7 +2,7 @@ package br.ufu.facom.ereno.benign.uc00;
 
 public class Input {
     public static String[] singleElectricalSourceFile = {
-            "E:\\ereno dataset\\electrical-sources\\resistencia100\\SILVIO_r00001_01.out"};
+            "C:\\Users\\zomca\\IdeaProjects\\ereno-uc09\\datasets\\SILVIO_r00001_01.out"};
     public static String[] electricalSourceFiles = {
             "E:\\ereno dataset\\electrical-sources\\resistencia100\\SILVIO_r00001_01.out",
             "E:\\ereno dataset\\electrical-sources\\resistencia100\\SILVIO_r00002_01.out",
